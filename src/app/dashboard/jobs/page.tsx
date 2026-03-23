@@ -6,6 +6,7 @@ import Pagination from '@/app/ui/jobs/pagination';
 import { CreateJob } from '@/app/ui/jobs/buttons';
 import { JobsTableSkeleton } from '@/app/ui/jobs/skeletons';
 import { fetchJobs } from '@/app/lib/data';
+import { lusitana } from '@/app/ui/fonts';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +25,7 @@ export default async function JobsPage(props: {
     <div className="w-full">
       {/* Header */}
       <div className="flex w-full items-center justify-between">
-        <h1 className="text-2xl font-semibold text-gray-900">Jobs Library</h1>
+        <h1 className={`${lusitana.className} text-2xl font-semibold text-gray-900`}>Jobs Library</h1>
       </div>
 
       {/* Toolbar */}
