@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { createJob } from '@/app/lib/data';
+import { JobInput, JobStatus, EmploymentType } from '@/app/lib/types';
 
 const DEPARTMENTS = ['Engineering', 'Product', 'Design', 'Finance', 'HR', 'Data', 'Marketing', 'Legal', 'Operations'];
 const LEVELS = ['Junior', 'Mid', 'Senior', 'Lead', 'Principal', 'Executive'];
@@ -19,32 +21,28 @@ export default function CreateJobForm() {
     setLoading(true);
     setError('');
     const fd = new FormData(e.currentTarget);
-    const input = {
+    const input: JobInput = {
       jobTitle: fd.get('jobTitle') as string,
       department: fd.get('department') as string,
       level: fd.get('level') as string,
       location: fd.get('location') as string,
       marketMedian: fd.get('marketMedian') ? Number(fd.get('marketMedian')) : undefined,
       internalMedian: fd.get('internalMedian') ? Number(fd.get('internalMedian')) : undefined,
-      status: fd.get('status') as string,
-      employmentType: fd.get('employmentType') as string,
+      status: fd.get('status') as JobStatus,
+      employmentType: fd.get('employmentType') as EmploymentType,
       remoteEligible: fd.get('remoteEligible') === 'on',
       headcountBudget: fd.get('headcountBudget') ? Number(fd.get('headcountBudget')) : undefined,
     };
+
+    console.log('[Form-Submit] Data:', input);
+
     try {
-      const res = await fetch(process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:4000/api/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: `mutation CreateJob($input: JobInput!) { createJob(input: $input) { id } }`,
-          variables: { input },
-        }),
-      });
-      const json = await res.json();
-      if (json.errors) throw new Error(json.errors[0].message);
+      await createJob(input);
+      console.log('[Form-Submit] Success');
       router.push('/dashboard/jobs');
       router.refresh();
     } catch (err: unknown) {
+      console.error('[Form-Submit] Error:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
